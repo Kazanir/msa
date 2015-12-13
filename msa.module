@@ -1,0 +1,128 @@
+<?php
+
+function msa_entity_info() {
+  $info = array();
+
+  $info['msa'] = array(
+    'label' => t('Metropolitan Statistical Area'),
+    'controller class' => 'MsaController',
+    'entity class' => 'Msa',
+    'module' => 'msa',
+    'base table' => 'msa',
+    'zip table' => 'msa_zip',
+    'city table' => 'msa_city',
+    'county table' => 'msa_county',
+    'fieldable' => TRUE,
+    'entity keys' => array(
+      'id' => 'cbsa',
+    ),
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full'),
+        'custom settings' => FALSE,
+      ),
+    ),
+    'load hook' => 'msa_load',
+  );
+
+  return $info;
+}
+
+function msa_load($id) {
+  $msa = msa_load_multiple(array($id), array());
+  return ($msa ? reset($msa) : FALSE);
+}
+
+function msa_load_multiple($ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('msa', $ids, $conditions, $reset);
+}
+
+
+
+function msa_fips_state_retrieve($code = NULL) {
+  static $codes = array(
+    1  => 'AL',
+    2  => 'AK',
+    60 => 'AS',
+    3  => '  ',
+    4  => 'AZ',
+    5  => 'AR',
+    81 => '  ',
+    6  => 'CA',
+    7  => '  ',
+    8  => 'CO',
+    9  => 'CT',
+    10 => 'DE',
+    11 => 'DC',
+    12 => 'FL',
+    64 => 'FM',
+    13 => 'GA',
+    14 => '  ',
+    66 => 'GU',
+    15 => 'HI',
+    84 => '  ',
+    16 => 'ID',
+    17 => 'IL',
+    18 => 'IN',
+    19 => 'IA',
+    86 => '  ',
+    67 => '  ',
+    20 => 'KS',
+    21 => 'KY',
+    89 => '  ',
+    22 => 'LA',
+    23 => 'ME',
+    68 => 'MH',
+    24 => 'MD',
+    25 => 'MA',
+    26 => 'MI',
+    71 => '  ',
+    27 => 'MN',
+    28 => 'MS',
+    29 => 'MO',
+    30 => 'MT',
+    76 => '  ',
+    31 => 'NE',
+    32 => 'NV',
+    33 => 'NH',
+    34 => 'NJ',
+    35 => 'NM',
+    36 => 'NY',
+    37 => 'NC',
+    38 => 'ND',
+    69 => 'MP',
+    39 => 'OH',
+    40 => 'OK',
+    41 => 'OR',
+    70 => 'PW',
+    95 => '  ',
+    42 => 'PA',
+    43 => '  ',
+    72 => 'PR',
+    44 => 'RI',
+    45 => 'SC',
+    46 => 'SD',
+    47 => 'TN',
+    48 => 'TX',
+    74 => 'UM',
+    49 => 'UT',
+    50 => 'VT',
+    51 => 'VA',
+    52 => '  ',
+    78 => 'VI',
+    79 => '  ',
+    53 => 'WA',
+    54 => 'WV',
+    55 => 'WI',
+    56 => 'WY',
+  );
+
+  if ($code) {
+    return (isset($codes[$code]) ? $codes[$code] : FALSE);
+  }
+  else {
+    return $codes;
+  }
+}
+
+

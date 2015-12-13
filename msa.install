@@ -1,0 +1,227 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ *
+ * MSAs are defined by 3 tables:
+ *   - The base table
+ *   - The principal cities table
+ *   - The counties table
+ *   - The zip code table
+ *
+ * In addition, we include another table for the larger Combined Statistical
+ * Areas for possible future use.
+ */
+function msa_schema() {
+  $schema = array();
+
+  $schema['msa'] = _msa_schema_msa();
+  $schema['msa_csa'] = _msa_schema_msa_csa();
+  $schema['msa_city'] = _msa_schema_msa_city();
+  $schema['msa_county'] = _msa_schema_msa_county();
+  $schema['msa_zip'] = _msa_schema_msa_zip();
+
+  return $schema;
+}
+
+function _msa_schema_msa() {
+  return array(
+    'description' => 'Base table for MSA/CBSA entities.',
+    'fields' => array(
+      'cbsa' => array(
+        'description' => 'Core-based stastical area code. Primary identifier.',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'The official name of the CBSA.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'type' => array(
+        'description' => 'Metropolitan or micropolitan statistical area.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'csa' => array(
+        'description' => 'The code of the CSA this CBSA belongs to, if any.',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => FALSE,
+        'unsigned' => TRUE,
+      ),
+    ),
+    'primary key' => array('cbsa'),
+    'indexes' => array(
+      'csa' => array('csa'),
+    ),
+  );
+}
+
+function _msa_schema_msa_city() {
+  return array(
+    'description' => 'Table for principal cities of CBSAs.',
+    'fields' => array(
+      'cbsa' => array(
+        'description' => 'Core-based stastical area code.',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'fips_state' => array(
+        'description' => 'FIPS State code for primary city.',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'state' => array(
+        'description' => 'The postal abbreviation for the state.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'fips_place' => array(
+        'description' => 'FIPS Place code for principal city.',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'city' => array(
+        'description' => 'The name of the principal city.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('cbsa', 'fips_state', 'fips_place'),
+    'indexes' => array(
+      'city' => array('city'),
+      'state' => array('state'),
+    ),
+  );
+}
+
+function _msa_schema_msa_county() {
+  return array(
+    'description' => 'Table for counties comprising a given CBSA.',
+    'fields' => array(
+      'cbsa' => array(
+        'description' => 'Core-based stastical area code.',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'fips_state' => array(
+        'description' => 'FIPS State code for primary city.',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'state' => array(
+        'description' => 'The postal abbreviation for the state.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'fips_county' => array(
+        'description' => 'FIPS County code for the county.',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'county' => array(
+        'description' => 'The name of the county.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'division' => array(
+        'description' => 'The name of the metropolitan division, if any.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      'division_code' => array(
+        'description' => 'The metropolitan division code, if any.',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => FALSE,
+      ),
+      'type' => array(
+        'description' => 'Whether this is a central or outlying county.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('cbsa', 'fips_state', 'fips_county'),
+    'indexes' => array(
+      'county' => array('county'),
+      'state' => array('state'),
+    ),
+  );
+}
+
+function _msa_schema_msa_zip() {
+  return array(
+    'description' => 'Table for zip codes comprising a given CBSA.',
+    'fields' => array(
+      'cbsa' => array(
+        'description' => 'Core-based stastical area code.',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'zip' => array(
+        'description' => 'US zip code',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'state' => array(
+        'description' => 'The postal abbreviation for the state.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('cbsa', 'zip'),
+    'indexes' => array(
+      'zip' => array('zip'),
+    ),
+  );
+}
+
+function _msa_schema_msa_csa() {
+  return array(
+    'description' => 'Table for zip codes comprising a given CBSA.',
+    'fields' => array(
+      'csa' => array(
+        'description' => 'Combined stastical area code.',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'The title of the combined statistical area.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('csa'),
+  );
+}

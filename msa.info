@@ -1,0 +1,13 @@
+name = Metropolitan Statistical Areas
+description = Provides an entity for referencing metro areas in the USA
+core = 7.x
+php = 5.4
+
+dependencies[] = addressfield
+dependencies[] = entity
+dependencies[] = views
+dependencies[] = migrate
+
+files[] = msa.entity.inc
+files[] = msa.controller.inc
+files[] = msa.migrate.inc
