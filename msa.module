@@ -12,6 +12,7 @@ function msa_entity_info() {
     'zip table' => 'msa_zip',
     'city table' => 'msa_city',
     'county table' => 'msa_county',
+    'state table' => 'msa_city',
     'fieldable' => TRUE,
     'entity keys' => array(
       'id' => 'cbsa',

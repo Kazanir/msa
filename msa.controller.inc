@@ -15,13 +15,34 @@ class MsaController extends EntityAPIController {
 
     foreach ($join_fields as $field) {
       if (isset(${$field})) {
-        $query->join($this->entityInfo["$field table"], $field, "base.cbsa = $field.cbsa");
+        $joinmethod = $field . 'Join';
+        $query->join($this->{$joinmethod}(), $field, "base.cbsa = $field.cbsa");
         $cond_value = (($field == 'zip') ? ${$field} : '%' . ${$field} . '%');
-        $query->condition("$field.$field", $cond_value, ($field == 'zip' ? '=' : 'LIKE'));
+        $query->condition("$field.$field", $cond_value, ($field == 'zip' || $field == 'state' ? '=' : 'LIKE'));
       }
     }
 
     return $query;
+  }
+
+  protected function cityJoin() {
+    return $this->entityInfo['city table'];
+  }
+
+  protected function stateJoin() {
+    $subquery = db_select($this->entityInfo['state table'], 'state');
+    $subquery->fields('state', array('cbsa', 'state'));
+    $subquery->distinct();
+
+    return $subquery;
+  }
+
+  protected function countyJoin() {
+    return $this->entityInfo['county table'];
+  }
+
+  protected function zipJoin() {
+    return $this->entityInfo['zip table'];
   }
 
   /**
