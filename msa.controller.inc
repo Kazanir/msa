@@ -17,12 +17,16 @@ class MsaController extends EntityAPIController {
       if (isset(${$field})) {
         $joinmethod = $field . 'Join';
         $query->join($this->{$joinmethod}(), $field, "base.cbsa = $field.cbsa");
-        $cond_value = (($field == 'zip') ? ${$field} : '%' . ${$field} . '%');
-        $query->condition("$field.$field", $cond_value, ($field == 'zip' || $field == 'state' ? '=' : 'LIKE'));
+        $cond_value = ($this->isLikeField($field) ? '%' . ${$field} . '%' : ${$field});
+        $query->condition("$field.$field", $cond_value, ($this->isLikeField($field) ? 'LIKE' : '='));
       }
     }
 
     return $query;
+  }
+
+  protected function isLikeField($field) {
+    return ($field == 'city' || $field == 'county');
   }
 
   protected function cityJoin() {
@@ -30,8 +34,8 @@ class MsaController extends EntityAPIController {
   }
 
   protected function stateJoin() {
-    $subquery = db_select($this->entityInfo['state table'], 'state');
-    $subquery->fields('state', array('cbsa', 'state'));
+    $subquery = db_select($this->entityInfo['state table'], 'stdist');
+    $subquery->fields('stdist', array('cbsa', 'state'));
     $subquery->distinct();
 
     return $subquery;
